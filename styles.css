@@ -202,4 +202,33 @@ input:focus {
 #result.moderate { background-color: var(--warning); color: var(--dark); }
 #result.unhealthy { background-color: var(--danger); color: white; }
 #result.very-unhealthy { background-color: #dc3545; color: white; }
-#result.hazardous { background-color: #6f42c1; color: white; }
+#result.hazardous { background-color: #6f42c1; color: white; }/* Add new severity levels */
+.scale-item[data-level="Severe"] { 
+    background: #800000; /* Dark red */
+    color: white;
+}
+
+.scale-item[data-level="Extreme"] { 
+    background: #4a0404; /* Very dark red */
+    color: white;
+    animation: pulse 2s infinite;
+}
+
+/* Add pulse animation for extreme cases */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+}
+
+/* Add to existing result styles */
+#result.severe { 
+    background-color: #800000; 
+    color: white;
+}
+
+#result.extreme { 
+    background-color: #4a0404; 
+    color: white;
+    animation: pulse 2s infinite;
+}

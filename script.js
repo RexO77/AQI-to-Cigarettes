@@ -21,15 +21,22 @@ function calculateCigarettes() {
     }
 
     const cigarettes = (aqi / 22).toFixed(2);
-    const message = `The AQI value of ${aqi} is equivalent to smoking ${cigarettes} cigarettes per day.`;
+    let message = `The AQI value of ${aqi} is equivalent to smoking ${cigarettes} cigarettes per day.`;
     
-    // Determine severity level
+    // Enhanced severity levels
     let severity;
     if (aqi <= 50) severity = 'good';
     else if (aqi <= 100) severity = 'moderate';
     else if (aqi <= 150) severity = 'unhealthy';
     else if (aqi <= 200) severity = 'very-unhealthy';
-    else severity = 'hazardous';
+    else if (aqi <= 300) severity = 'hazardous';
+    else if (aqi <= 500) severity = 'severe';
+    else severity = 'extreme';
+
+    // Add warning for extreme cases
+    if (aqi > 500) {
+        message += ' ⚠️ EXTREME HAZARD: Immediate health risk!';
+    }
 
     showResult(message, severity);
     updateVisual(cigarettes);
