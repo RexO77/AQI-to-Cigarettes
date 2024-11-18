@@ -17,7 +17,14 @@
     <div class="container">
         <h1>AQI to Cigarettes <span class="badge">Calculator</span></h1>
         <div class="input-container">
-            <input type="number" id="aqiInput" placeholder="Enter AQI value">
+            <div class="search-box">
+                <input type="text" id="cityInput" placeholder="Enter city name">
+                <button onclick="fetchAQIData()" class="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            <div class="divider">OR</div>
+            <input type="number" id="aqiInput" placeholder="Enter AQI value manually">
             <button onclick="calculateCigarettes()" class="calculate-btn">
                 <span>Calculate</span>
                 <i class="fas fa-calculator"></i>

@@ -66,15 +66,17 @@ body {
 .input-container {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 2rem;
+    gap: 1.5rem;           /* Increased from 1rem */
+    margin: 3rem 0;       /* Changed from margin-bottom */
+    width: 100%;
+    padding: 0 1rem;      /* Added horizontal padding */
 }
 
 input {
-    padding: 1rem;
+    padding: 1.2rem;      /* Increased from 1rem */
     border: 2px solid transparent;
-    border-radius: 10px;
-    font-size: 1.1rem;
+    border-radius: 12px;  /* Slightly increased */
+    font-size: 1.2rem;    /* Slightly increased */
     background: var(--bg-color);
     color: var(--text-color);
 }
@@ -86,7 +88,7 @@ input:focus {
 }
 
 .calculate-btn {
-    padding: 1rem;
+    padding: 1.2rem;      /* Increased from 1rem */
     border: none;
     background: var(--primary);
     color: white;
@@ -97,6 +99,7 @@ input:focus {
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
+    margin-top: 0.5rem;   /* Added */
 }
 
 .calculate-btn:hover {
@@ -144,7 +147,13 @@ input:focus {
     }
 
     h1 {
-        font-size: 1.8rem;
+        margin-bottom: 2rem;
+        font-size: 2rem;
+    }
+
+    .input-container {
+        margin: 2rem 0;
+        padding: 0 0.5rem;
     }
 }
 
@@ -162,7 +171,9 @@ input:focus {
         right: 10px;
         font-size: 1.2rem;
     }
-}/* Add these styles */
+}
+
+/* Add these styles */
 .scale-item[data-level="Good"] { 
     background: var(--success);
     color: white;
@@ -202,7 +213,9 @@ input:focus {
 #result.moderate { background-color: var(--warning); color: var(--dark); }
 #result.unhealthy { background-color: var(--danger); color: white; }
 #result.very-unhealthy { background-color: #dc3545; color: white; }
-#result.hazardous { background-color: #6f42c1; color: white; }/* Add new severity levels */
+#result.hazardous { background-color: #6f42c1; color: white; }
+
+/* Add new severity levels */
 .scale-item[data-level="Severe"] { 
     background: #800000; /* Dark red */
     color: white;
@@ -231,4 +244,68 @@ input:focus {
     background-color: #4a0404; 
     color: white;
     animation: pulse 2s infinite;
+}
+
+h1 {
+    margin-bottom: 3rem;  /* Increased from 2rem */
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.4;  /* Added for better readability */
+}
+
+.badge {
+    display: inline-block;  /* Added */
+    margin-top: 0.5rem;     /* Added */
+    background: var(--primary);
+    color: white;
+    padding: 0.4rem 1rem;   /* Adjusted padding */
+    border-radius: 1rem;
+    font-size: 1rem;
+    vertical-align: middle;
+}
+
+/* Add to styles.css */
+.search-box {
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.search-box input {
+    flex: 1;
+}
+
+.search-btn {
+    padding: 1.2rem;
+    border: none;
+    background: var(--primary);
+    color: white;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.divider {
+    text-align: center;
+    font-weight: 500;
+    color: var(--text-color);
+    margin: 1rem 0;
+}
+
+.loading {
+    animation: pulse 1.5s infinite;
+}
+
+.location-info {
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    color: var(--text-color);
+}
+
+.pm25-info {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--bg-color);
+    border-radius: 10px;
+    font-size: 0.9rem;
 }
