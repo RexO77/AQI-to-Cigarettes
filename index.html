@@ -1,17 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AQI to Cigarettes</title>
+    <title>AQI to Cigarettes Calculator</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+    <div class="theme-toggle">
+        <i class="fas fa-moon"></i>
+    </div>
     <div class="container">
-        <h1>AQI to Cigarettes</h1>
-        <input type="number" id="aqiInput" placeholder="Enter AQI value">
-        <button onclick="calculateCigarettes()">Calculate</button>
-        <p id="result"></p>
+        <h1>AQI to Cigarettes <span class="badge">Calculator</span></h1>
+        <div class="input-container">
+            <input type="number" id="aqiInput" placeholder="Enter AQI value">
+            <button onclick="calculateCigarettes()" class="calculate-btn">
+                <span>Calculate</span>
+                <i class="fas fa-calculator"></i>
+            </button>
+        </div>
+        <div class="result-container">
+            <div id="result"></div>
+            <div class="cigarette-visual"></div>
+            <div class="aqi-scale">
+                <div class="scale-item" data-level="Good">0-50</div>
+                <div class="scale-item" data-level="Moderate">51-100</div>
+                <div class="scale-item" data-level="Unhealthy">101-150</div>
+                <div class="scale-item" data-level="Very Unhealthy">151-200</div>
+                <div class="scale-item" data-level="Hazardous">201+</div>
+            </div>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>

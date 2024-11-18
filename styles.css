@@ -1,47 +1,174 @@
+:root {
+    --primary: #007BFF;
+    --secondary: #6c757d;
+    --success: #28a745;
+    --danger: #dc3545;
+    --warning: #ffc107;
+    --info: #17a2b8;
+    --light: #f8f9fa;
+    --dark: #343a40;
+    --transition: all 0.3s ease;
+}
+
+[data-theme="dark"] {
+    --bg-color: #1a1a1a;
+    --text-color: #ffffff;
+    --container-bg: #2d2d2d;
+    --shadow-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="light"] {
+    --bg-color: #f0f0f0;
+    --text-color: #333333;
+    --container-bg: #ffffff;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    transition: var(--transition);
+}
+
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    margin: 0;
-    background-color: #f0f0f0;
+    min-height: 100vh;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    position: relative;
+}
+
+.theme-toggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    cursor: pointer;
+    font-size: 1.5rem;
+    padding: 10px;
+    border-radius: 50%;
+    background: var(--container-bg);
+    box-shadow: 0 0 10px var(--shadow-color);
 }
 
 .container {
-    text-align: center;
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 600px;
+    background: var(--container-bg);
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 0 0 20px var(--shadow-color);
+    transform: translateY(0);
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
 }
 
 h1 {
-    margin-bottom: 20px;
+    margin-bottom: 2rem;
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.badge {
+    background: var(--primary);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 1rem;
+    vertical-align: middle;
+}
+
+.input-container {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
 }
 
 input {
-    padding: 10px;
-    width: 200px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    flex: 1;
+    padding: 1rem;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    background: var(--bg-color);
+    color: var(--text-color);
+    transition: var(--transition);
 }
 
-button {
-    padding: 10px 20px;
+input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+.calculate-btn {
+    padding: 1rem 2rem;
     border: none;
-    background-color: #007BFF;
+    background: var(--primary);
     color: white;
-    border-radius: 5px;
+    border-radius: 10px;
     cursor: pointer;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: var(--transition);
 }
 
-button:hover {
-    background-color: #0056b3;
+.calculate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
 }
 
-p {
-    margin-top: 20px;
-    font-size: 18px;
+.result-container {
+    text-align: center;
+}
+
+#result {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    border-radius: 10px;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+#result.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.aqi-scale {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.scale-item {
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    transition: var(--transition);
+}
+
+.scale-item[data-level="Good"] { background: #28a745; color: white; }
+.scale-item[data-level="Moderate"] { background: #ffc107; }
+.scale-item[data-level="Unhealthy"] { background: #fd7e14; color: white; }
+.scale-item[data-level="Very Unhealthy"] { background: #dc3545; color: white; }
+.scale-item[data-level="Hazardous"] { background: #6f42c1; color: white; }
+
+.cigarette-visual {
+    height: 100px;
+    margin: 2rem auto;
+    transition: var(--transition);
 }
