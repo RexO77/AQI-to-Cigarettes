@@ -121,7 +121,7 @@ themeToggle.addEventListener('click', () => {
         '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
 });
 
-const API_KEY = process.env.OPENWEATHERMAP_API_KEY;
+const API_KEY = '7f74765aaa2a9fb00ac8e6262e582771';
 
 async function fetchAQIData() {
     const cityInput = document.getElementById('cityInput');
