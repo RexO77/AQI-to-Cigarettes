@@ -2,17 +2,68 @@ function getSystemTheme() {
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
+// Cities database (you can expand this list)
+const cities = [
+    "New York", "London", "Paris", "Tokyo", "Sydney", "Mumbai", "Dubai",
+    "Singapore", "Hong Kong", "Toronto", "Berlin", "Madrid", "Rome", "Moscow",
+    "Beijing", "Shanghai", "Seoul", "Bangkok", "Istanbul", "Cairo", "Rio de Janeiro",
+    "São Paulo", "Mexico City", "Los Angeles", "Chicago", "Houston", "Phoenix",
+    "San Francisco", "Seattle", "Boston", "Miami", "Vancouver", "Montreal"
+];
+
+function setupAutocomplete() {
+    const input = document.getElementById('cityInput');
+    const autocompleteList = document.getElementById('autocomplete-list');
+    
+    input.addEventListener('input', function() {
+        const value = this.value.toLowerCase();
+        autocompleteList.innerHTML = '';
+        
+        if (!value) {
+            autocompleteList.style.display = 'none';
+            return;
+        }
+
+        const matches = cities.filter(city => 
+            city.toLowerCase().startsWith(value)
+        );
+
+        if (matches.length > 0) {
+            autocompleteList.style.display = 'block';
+            matches.forEach(city => {
+                const div = document.createElement('div');
+                div.textContent = city;
+                div.className = 'autocomplete-item';
+                div.addEventListener('click', () => {
+                    input.value = city;
+                    autocompleteList.style.display = 'none';
+                    fetchAQIData();
+                });
+                autocompleteList.appendChild(div);
+            });
+        } else {
+            autocompleteList.style.display = 'none';
+        }
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!input.contains(e.target) && !autocompleteList.contains(e.target)) {
+            autocompleteList.style.display = 'none';
+        }
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const themeToggle = document.querySelector('.theme-toggle');
     const html = document.documentElement;
 
-    // Set initial theme based on system preference
+    setupAutocomplete();
+
     const systemTheme = getSystemTheme();
     html.setAttribute('data-theme', systemTheme);
     themeToggle.innerHTML = systemTheme === 'light' ? 
         '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
 
-    // Listen for system theme changes
     window.matchMedia('(prefers-color-scheme: dark)')
         .addEventListener('change', e => {
             const newTheme = e.matches ? 'dark' : 'light';
@@ -21,7 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
         });
 
-    // Theme toggle click handler
     themeToggle.addEventListener('click', () => {
         const currentTheme = html.getAttribute('data-theme');
         const newTheme = currentTheme === 'light' ? 'dark' : 'light';
@@ -141,8 +191,29 @@ async function fetchAQIData() {
 
         // Process and display AQI data
         if (aqiData.list && aqiData.list.length > 0) {
-            const aqi = aqiData.list[0].main.aqi * 50; // Convert to AQI scale
-            document.getElementById('aqiInput').value = aqi; // Update input field
+            // Convert API's AQI values to actual AQI
+            const components = aqiData.list[0].components;
+            // Calculate AQI based on PM2.5 concentration (most common pollutant)
+            const pm25 = components.pm2_5;
+            let aqi;
+            
+            // EPA's AQI calculation for PM2.5
+            if (pm25 <= 12.0) {
+                aqi = linearScale(pm25, 0, 12.0, 0, 50);
+            } else if (pm25 <= 35.4) {
+                aqi = linearScale(pm25, 12.1, 35.4, 51, 100);
+            } else if (pm25 <= 55.4) {
+                aqi = linearScale(pm25, 35.5, 55.4, 101, 150);
+            } else if (pm25 <= 150.4) {
+                aqi = linearScale(pm25, 55.5, 150.4, 151, 200);
+            } else if (pm25 <= 250.4) {
+                aqi = linearScale(pm25, 150.5, 250.4, 201, 300);
+            } else {
+                aqi = linearScale(pm25, 250.5, 500.4, 301, 500);
+            }
+
+            aqi = Math.round(aqi);
+            document.getElementById('aqiInput').value = aqi;
             calculateCigarettes(aqi);
         } else {
             throw new Error('No AQI data available for this location');
@@ -155,6 +226,11 @@ async function fetchAQIData() {
     } finally {
         cityInput.classList.remove('loading');
     }
+}
+
+// Linear scale helper function for AQI calculation
+function linearScale(value, fromMin, fromMax, toMin, toMax) {
+    return (value - fromMin) * (toMax - toMin) / (fromMax - fromMin) + toMin;
 }
 
 // Add enter key support
