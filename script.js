@@ -2,42 +2,53 @@ function getSystemTheme() {
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
-// Cities database (you can expand this list)
-const cities = [
-    "New York", "London", "Paris", "Tokyo", "Sydney", "Mumbai", "Dubai",
-    "Singapore", "Hong Kong", "Toronto", "Berlin", "Madrid", "Rome", "Moscow",
-    "Beijing", "Shanghai", "Seoul", "Bangkok", "Istanbul", "Cairo", "Rio de Janeiro",
-    "São Paulo", "Mexico City", "Los Angeles", "Chicago", "Houston", "Phoenix",
-    "San Francisco", "Seattle", "Boston", "Miami", "Vancouver", "Montreal"
-];
+// Function to fetch city suggestions from OpenWeatherMap Geocoding API
+async function fetchCitySuggestions(query) {
+    const limit = 5; // Number of suggestions to display
+    const url = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=${limit}&appid=${API_KEY}`;
 
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error('Error fetching city suggestions');
+        }
+        const data = await response.json();
+        return data; // Returns an array of city objects
+    } catch (error) {
+        console.error(error);
+        return [];
+    }
+}
+
+// Update the autocomplete setup function
 function setupAutocomplete() {
     const input = document.getElementById('cityInput');
     const autocompleteList = document.getElementById('autocomplete-list');
     
-    input.addEventListener('input', function() {
-        const value = this.value.toLowerCase();
+    input.addEventListener('input', async function() {
+        const query = this.value.trim();
         autocompleteList.innerHTML = '';
         
-        if (!value) {
+        if (!query) {
             autocompleteList.style.display = 'none';
             return;
         }
 
-        const matches = cities.filter(city => 
-            city.toLowerCase().startsWith(value)
-        );
+        const cities = await fetchCitySuggestions(query);
 
-        if (matches.length > 0) {
+        if (cities.length > 0) {
             autocompleteList.style.display = 'block';
-            matches.forEach(city => {
+            cities.forEach(city => {
                 const div = document.createElement('div');
-                div.textContent = city;
+                const cityName = `${city.name}, ${city.state ? city.state + ', ' : ''}${city.country}`;
+                div.textContent = cityName;
                 div.className = 'autocomplete-item';
                 div.addEventListener('click', () => {
-                    input.value = city;
+                    input.value = cityName;
+                    input.dataset.lat = city.lat;
+                    input.dataset.lon = city.lon;
                     autocompleteList.style.display = 'none';
-                    fetchAQIData();
+                    fetchAQIData(city.lat, city.lon);
                 });
                 autocompleteList.appendChild(div);
             });
@@ -155,31 +166,34 @@ document.getElementById('aqiInput').addEventListener('input', (e) => {
 
 const API_KEY = '7f74765aaa2a9fb00ac8e6262e582771';
 
-async function fetchAQIData() {
+async function fetchAQIData(lat = null, lon = null) {
     const cityInput = document.getElementById('cityInput');
     const city = cityInput.value.trim();
     
-    if (!city) {
+    if (!city && (lat === null || lon === null)) {
         showResult('Please enter a city name', 'warning');
         return;
     }
 
     try {
         cityInput.classList.add('loading');
-        
-        // Fetch geolocation data
-        const geoUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(city)}&limit=1&appid=${API_KEY}`;
-        const geoResponse = await fetch(geoUrl);
-        if (!geoResponse.ok) {
-            throw new Error('Error fetching geolocation data');
-        }
-        const geoData = await geoResponse.json();
 
-        if (!geoData.length) {
-            throw new Error('City not found');
-        }
+        if (lat === null || lon === null) {
+            // Fetch geolocation data
+            const geoUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(city)}&limit=1&appid=${API_KEY}`;
+            const geoResponse = await fetch(geoUrl);
+            if (!geoResponse.ok) {
+                throw new Error('Error fetching geolocation data');
+            }
+            const geoData = await geoResponse.json();
 
-        const { lat, lon } = geoData[0];
+            if (!geoData.length) {
+                throw new Error('City not found');
+            }
+
+            lat = geoData[0].lat;
+            lon = geoData[0].lon;
+        }
 
         // Fetch AQI data
         const aqiUrl = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${API_KEY}`;
@@ -191,38 +205,25 @@ async function fetchAQIData() {
 
         // Process and display AQI data
         if (aqiData.list && aqiData.list.length > 0) {
-            // Convert API's AQI values to actual AQI
             const components = aqiData.list[0].components;
-            // Calculate AQI based on PM2.5 concentration (most common pollutant)
             const pm25 = components.pm2_5;
-            let aqi;
-            
-            // EPA's AQI calculation for PM2.5
-            if (pm25 <= 12.0) {
-                aqi = linearScale(pm25, 0, 12.0, 0, 50);
-            } else if (pm25 <= 35.4) {
-                aqi = linearScale(pm25, 12.1, 35.4, 51, 100);
-            } else if (pm25 <= 55.4) {
-                aqi = linearScale(pm25, 35.5, 55.4, 101, 150);
-            } else if (pm25 <= 150.4) {
-                aqi = linearScale(pm25, 55.5, 150.4, 151, 200);
-            } else if (pm25 <= 250.4) {
-                aqi = linearScale(pm25, 150.5, 250.4, 201, 300);
-            } else {
-                aqi = linearScale(pm25, 250.5, 500.4, 301, 500);
-            }
 
-            aqi = Math.round(aqi);
-            document.getElementById('aqiInput').value = aqi;
-            calculateCigarettes(aqi);
+            // Calculate AQI from PM2.5
+            const aqiValue = calculateAQIFromPM25(pm25);
+            document.getElementById('aqiInput').value = aqiValue;
+            calculateCigarettes(aqiValue);
         } else {
             throw new Error('No AQI data available for this location');
         }
 
     } catch (error) {
-        showResult(error.message === 'City not found' ? 
-            'City not found. Please check the spelling and try again.' : 
-            'Error fetching AQI data. Please try again later.', 'warning');
+        console.error(error);
+        showResult(
+            error.message === 'City not found'
+                ? 'City not found. Please check the spelling and try again.'
+                : 'Error fetching AQI data. Please try again later.',
+            'warning'
+        );
     } finally {
         cityInput.classList.remove('loading');
     }
@@ -233,9 +234,37 @@ function linearScale(value, fromMin, fromMax, toMin, toMax) {
     return (value - fromMin) * (toMax - toMin) / (fromMax - fromMin) + toMin;
 }
 
+function calculateAQIFromPM25(pm25) {
+    let aqi;
+    if (pm25 <= 12.0) {
+        aqi = linearScale(pm25, 0.0, 12.0, 0, 50);
+    } else if (pm25 <= 35.4) {
+        aqi = linearScale(pm25, 12.1, 35.4, 51, 100);
+    } else if (pm25 <= 55.4) {
+        aqi = linearScale(pm25, 35.5, 55.4, 101, 150);
+    } else if (pm25 <= 150.4) {
+        aqi = linearScale(pm25, 55.5, 150.4, 151, 200);
+    } else if (pm25 <= 250.4) {
+        aqi = linearScale(pm25, 150.5, 250.4, 201, 300);
+    } else if (pm25 <= 500.4) {
+        aqi = linearScale(pm25, 250.5, 500.4, 301, 500);
+    } else {
+        aqi = 500; // Maximum AQI value
+    }
+    return Math.round(aqi);
+}
+
 // Add enter key support
 document.getElementById('cityInput').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
-        fetchAQIData();
+        // Use latitude and longitude if available
+        const lat = e.target.dataset.lat;
+        const lon = e.target.dataset.lon;
+        fetchAQIData(lat, lon);
     }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Existing code...
+    setupAutocomplete();
 });
