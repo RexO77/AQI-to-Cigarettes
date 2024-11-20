@@ -31,32 +31,31 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-function calculateCigarettes() {
-    const aqi = document.getElementById('aqiInput').value;
+function calculateCigarettes(aqi = null) {
+    const manualAqi = document.getElementById('aqiInput').value;
+    const aqiValue = aqi !== null ? aqi : manualAqi;
     const resultDiv = document.getElementById('result');
     const cigaretteVisual = document.querySelector('.cigarette-visual');
 
-    if (aqi === '') {
-        showResult('Please enter an AQI value.', 'warning');
+    if (!aqiValue) {
+        showResult('Please enter an AQI value or search for a city.', 'warning');
         return;
     }
 
-    const cigarettes = (aqi / 22).toFixed(2);
-    let message = `The AQI value of ${aqi} is equivalent to smoking ${cigarettes} cigarettes per day.`;
+    const cigarettes = (aqiValue / 22).toFixed(2);
+    let message = `The AQI value of ${aqiValue} is equivalent to smoking ${cigarettes} cigarettes per day.`;
     
-    // Enhanced severity levels with no upper limit
     let severity;
-    if (aqi <= 50) severity = 'good';
-    else if (aqi <= 100) severity = 'moderate';
-    else if (aqi <= 150) severity = 'unhealthy';
-    else if (aqi <= 200) severity = 'very-unhealthy';
-    else if (aqi <= 300) severity = 'hazardous';
-    else if (aqi <= 500) severity = 'severe';
+    if (aqiValue <= 50) severity = 'good';
+    else if (aqiValue <= 100) severity = 'moderate';
+    else if (aqiValue <= 150) severity = 'unhealthy';
+    else if (aqiValue <= 200) severity = 'very-unhealthy';
+    else if (aqiValue <= 300) severity = 'hazardous';
+    else if (aqiValue <= 500) severity = 'severe';
     else severity = 'extreme';
 
-    // Add warning for extreme cases with more specific messages
-    if (aqi > 500) {
-        if (aqi > 1000) {
+    if (aqiValue > 500) {
+        if (aqiValue > 1000) {
             message += ' ⚠️ CATASTROPHIC LEVELS: Severe and immediate health risk! Seek clean air immediately!';
         } else {
             message += ' ⚠️ EXTREME HAZARD: Immediate health risk!';
@@ -70,27 +69,20 @@ function calculateCigarettes() {
 function showResult(message, severity) {
     const resultDiv = document.getElementById('result');
     resultDiv.textContent = message;
-    resultDiv.className = ''; // Reset classes
-    
-    // Add styling based on severity
+    resultDiv.className = ''; 
     resultDiv.classList.add(severity);
     resultDiv.classList.add('show');
-    
-    // Trigger animation
     resultDiv.style.animation = 'none';
-    resultDiv.offsetHeight; // Trigger reflow
+    resultDiv.offsetHeight;
     resultDiv.style.animation = 'slideIn 0.5s ease forwards';
 }
 
-// Update updateVisual function to handle larger numbers
 function updateVisual(cigarettes) {
     const visual = document.querySelector('.cigarette-visual');
-    // Increase max cigarettes shown and add a multiplier for extreme cases
     const maxCigarettes = 10;
     const cigaretteCount = Math.min(Math.ceil(cigarettes), maxCigarettes);
     
     let display = '🚬'.repeat(cigaretteCount);
-    // Add multiplier text for large numbers
     if (cigarettes > maxCigarettes) {
         display += ` (${Math.floor(cigarettes/maxCigarettes)}x)`;
     }
@@ -105,20 +97,10 @@ function updateVisual(cigarettes) {
     }, 100);
 }
 
-// Update the input validation
 document.getElementById('aqiInput').addEventListener('input', (e) => {
-    // Only check for negative values
     if (e.target.value < 0) {
         e.target.value = 0;
     }
-});
-// Theme toggle click handler
-themeToggle.addEventListener('click', () => {
-    const currentTheme = html.getAttribute('data-theme');
-    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-    html.setAttribute('data-theme', newTheme);
-    themeToggle.innerHTML = newTheme === 'light' ? 
-        '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
 });
 
 const API_KEY = '7f74765aaa2a9fb00ac8e6262e582771';
@@ -142,7 +124,6 @@ async function fetchAQIData() {
             throw new Error('Error fetching geolocation data');
         }
         const geoData = await geoResponse.json();
-        console.log('Geolocation Data:', geoData);
 
         if (!geoData.length) {
             throw new Error('City not found');
@@ -157,9 +138,15 @@ async function fetchAQIData() {
             throw new Error('Error fetching AQI data');
         }
         const aqiData = await aqiResponse.json();
-        console.log('AQI Data:', aqiData);
 
-        // Process AQI data as needed
+        // Process and display AQI data
+        if (aqiData.list && aqiData.list.length > 0) {
+            const aqi = aqiData.list[0].main.aqi * 50; // Convert to AQI scale
+            document.getElementById('aqiInput').value = aqi; // Update input field
+            calculateCigarettes(aqi);
+        } else {
+            throw new Error('No AQI data available for this location');
+        }
 
     } catch (error) {
         showResult(error.message === 'City not found' ? 
