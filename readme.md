@@ -1,52 +1,52 @@
-# AQI to Cigarettes Calculator 🌍🚬
+# AQI to Cigarettes Calculator 🌍💨
 
-A sleek, interactive web application that converts Air Quality Index (AQI) values into equivalent daily cigarettes smoked, helping users understand air pollution impact in familiar terms.
+> An intuitive web application that translates Air Quality Index (AQI) into equivalent cigarettes smoked per day, making air pollution impact more relatable.
 
-## Features 🌟
+[![Live Demo](https://img.shields.io/badge/Demo-Live-success?style=for-the-badge)](https://rexo77.github.io/AQI-to-Cigarettes/)
+[![MIT License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
+[![OpenWeatherMap](https://img.shields.io/badge/API-OpenWeatherMap-orange?style=for-the-badge)](https://openweathermap.org/)
 
-- **City Search**: Auto-complete city search with OpenWeatherMap API integration
-- **Real-time AQI Data**: Fetches current air quality data for any searched location
-- **Manual Input**: Option to manually enter AQI values
-- **Visual Feedback**: 
-    - Dynamic cigarette emoji visualization
-    - Color-coded severity levels
-    - Animated warnings for extreme conditions
-- **Responsive Design**: Works seamlessly on all devices
-- **Dark/Light Theme**: Automatic system theme detection with manual toggle
+## ✨ Features
 
-## AQI Severity Levels 📊
+### Core Functionality
+- 🔍 **Smart City Search**
+  - Real-time autocomplete suggestions
+  - Global city coverage
+  - Precise location disambiguation
+  
+- 📊 **AQI Analysis**
+  - Live air quality data
+  - PM2.5 concentration metrics
+  - Historical data comparison
+  
+- 🎨 **Interactive UI**
+  - Dynamic cigarette visualizations
+  - Color-coded severity indicators
+  - Smooth animations & transitions
 
-- 0-50: Good (Green)
-- 51-100: Moderate (Yellow)
-- 101-150: Unhealthy (Red)
-- 151-200: Very Unhealthy (Dark Red)
-- 201-300: Hazardous (Purple)
-- 301-500: Severe (Dark Red)
-- 500+: Extreme (Very Dark Red with Pulsing Animation)
+### Technical Highlights
+- 🌓 Automatic & manual theme switching
+- 📱 Fully responsive design
+- ⚡ Zero dependencies
+- 🔒 Secure API handling
 
-## Technical Details 🛠️
+## 🎯 AQI Severity Scale
 
-- **Frontend**: Pure HTML, CSS, and JavaScript
-- **APIs**: OpenWeatherMap (Geocoding and Air Pollution data)
-- **Animations**: CSS transitions and keyframes
-- **Responsive**: Mobile-first design approach
-- **Accessibility**: High contrast themes and intuitive UI
+| AQI Range | Level | Health Impact | Visual Indicator |
+|-----------|-------|---------------|------------------|
+| 0-50 | Good | Minimal | 🟢 |
+| 51-100 | Moderate | Minor breathing discomfort | 🟡 |
+| 101-150 | Unhealthy | Breathing difficulties | 🟠 |
+| 151-200 | Very Unhealthy | Serious health effects | 🔴 |
+| 201-300 | Hazardous | Emergency conditions | 🟣 |
+| 301-500 | Severe | Severe health warnings | 🟤 |
+| 500+ | Extreme | Immediate health risk | ⚫ |
 
-## Setup 🚀
+## 🚀 Getting Started
 
+### Prerequisites
+- Web browser (Chrome, Firefox, Safari, Edge)
+- OpenWeatherMap API key
+
+### Quick Start
 1. Clone the repository
-2. Replace `API_KEY` in `script.js` with your OpenWeatherMap API key
-3. Open `index.html` in a browser
-
-## Dependencies 📦
-
-- Font Awesome 6.0.0
-- Google Fonts (Poppins)
-
-## Browser Support 🌐
-
-Compatible with all modern browsers supporting ES6+ features.
-
-## License 📄
-
-MIT License
