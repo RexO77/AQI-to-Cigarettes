@@ -50,3 +50,68 @@
 
 ### Quick Start
 1. Clone the repository
+   ```bash
+   git clone https://github.com/Niyam07/aqi-to-smoke.git
+   cd aqi-to-smoke
+   ```
+
+2. Get an API key from [OpenWeatherMap](https://openweathermap.org/api/air-pollution)
+3. Open `script.js` and replace `'YOUR_API_KEY'` with your actual API key
+4. Open `index.html` in a web browser
+
+## 🛠️ Usage
+
+1. **Enter City Name**
+   - Type any city name in the search box
+   - Select your city from the dropdown suggestions
+
+2. **View Results**
+   - Current AQI level and equivalent cigarettes
+   - Detailed air quality information
+   - Health recommendations
+
+3. **Toggle Settings**
+   - Switch between light/dark theme
+   - Change temperature units (Celsius/Fahrenheit)
+
+## 📱 Mobile Experience
+- Optimized for all screen sizes
+- Touch-friendly interface
+- Offline functionality for previously searched cities
+
+## 🌐 API Reference
+This project uses the following APIs:
+- [OpenWeatherMap Air Pollution API](https://openweathermap.org/api/air-pollution)
+- [OpenWeatherMap Geocoding API](https://openweathermap.org/api/geocoding-api)
+
+## 🤝 Contributing
+
+### How to Contribute
+1. Fork the repository
+2. Create a new branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Code Style
+- Follow standard JavaScript style guide
+- Use meaningful variable names
+- Add comments for complex logic
+- Keep the code DRY (Don't Repeat Yourself)
+
+## 📄 License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+- Data provided by OpenWeatherMap
+- Inspired by Berkeley Earth's cigarette equivalent research
+- Icons from [Font Awesome](https://fontawesome.com/)
+
+## 📬 Contact
+For questions or feedback, please reach out to [@Niyam07](https://github.com/Niyam07) on GitHub.
+
+---
+
+<div align="center">
+  Made with ❤️ for a cleaner planet
+</div>
