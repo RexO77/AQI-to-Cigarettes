@@ -108,7 +108,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Icons from [Font Awesome](https://fontawesome.com/)
 
 ## 📬 Contact
-For questions or feedback, please reach out to [@Niyam07](https://github.com/Niyam07) on GitHub.
+For questions or feedback, please reach out to [@Niyam07](https://github.com/rexO77) on GitHub.
 
 ---
 
