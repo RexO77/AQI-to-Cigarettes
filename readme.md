@@ -51,7 +51,7 @@
 ### Quick Start
 1. Clone the repository
    ```bash
-   git clone https://github.com/Niyam07/aqi-to-smoke.git
+   git clone https://github.com/rexo77/aqi-to-cigaretts.git
    cd aqi-to-smoke
    ```
 

@@ -3,58 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AQI to Cigarettes Calculator</title>
-    
+    <meta name="description" content="Transform air quality data into relatable cigarette equivalents. Advanced AQI calculator with stunning visualizations and intelligent features.">
+    <meta name="keywords" content="AQI, air quality, pollution, cigarettes, calculator, health, environment">
+    <title>AQI to Cigarettes Calculator - Advanced Air Quality Tool</title>
+
+    <!-- Performance & PWA -->
+    <link rel="dns-prefetch" href="//api.openweathermap.org">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
     <!-- Favicon Tags -->
     <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
     <link rel="manifest" href="favicon/site.webmanifest">
     <meta name="msapplication-TileColor" content="#007BFF">
+    <meta name="theme-color" content="#007BFF">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="AQI to Cigarettes Calculator">
+    <meta property="og:description" content="Transform air quality data into relatable cigarette equivalents">
     <meta property="og:image" content="favicon/og-image.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    
-    <!-- Existing Tags -->
+    <meta property="og:type" content="website">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+
+    <!-- Styles -->
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <meta name="theme-color" content="#007BFF">
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="theme-toggle">
-        <i class="fas fa-moon"></i>
-    </div>
-    <div class="container">
-        <h1>AQI to Cigarettes <span class="badge">Calculator</span></h1>
-        <div class="input-container">
-            <div class="search-box">
-                <input type="text" id="cityInput" placeholder="Enter city name">
-                <button onclick="fetchAQIData()" class="search-btn">
-                    <i class="fas fa-search"></i>
-                </button>
-                <div id="autocomplete-list" class="autocomplete-items"></div>
+    <!-- Accessibility Skip Links -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <a href="#search-input" class="skip-link">Skip to search</a>
+
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" aria-label="Toggle theme" type="button">
+        <i class="fas fa-moon" aria-hidden="true"></i>
+        <i class="fas fa-sun" aria-hidden="true"></i>
+    </button>
+
+    <!-- Voice Interface Button -->
+    <button class="voice-toggle" aria-label="Voice commands" type="button" style="display: none;">
+        <i class="fas fa-microphone" aria-hidden="true"></i>
+    </button>
+
+    <!-- Main Application -->
+    <main id="main-content" class="app-container" role="main">
+        <!-- Header -->
+        <header class="app-header">
+            <h1>AQI to Cigarettes <span class="badge">Fast</span></h1>
+            <p class="app-description">Quick air quality insights with optimized performance</p>
+        </header>
+
+        <!-- Search Component Container -->
+        <section class="search-container" aria-labelledby="search-heading">
+            <h2 id="search-heading" class="sr-only">City Search</h2>
+            <!-- Search will be loaded here -->
+        </section>
+
+        <!-- Results Component Container (Lazy loaded) -->
+        <div id="results-placeholder" class="placeholder">
+            <div class="placeholder-content">
+                <i class="fas fa-search"></i>
+                <p>Search for a city to see air quality results</p>
             </div>
-            <div class="divider">OR</div>
-            <input type="number" id="aqiInput" placeholder="Enter AQI value manually">
-            <button onclick="calculateCigarettes()" class="calculate-btn">
-                <span>Calculate</span>
-                <i class="fas fa-calculator"></i>
-            </button>
         </div>
-        <div class="result-container">
-            <div id="result"></div>
-            <div class="cigarette-visual"></div>
-            <div class="aqi-scale">
-                <div class="scale-item" data-level="Good">0-50</div>
-                <div class="scale-item" data-level="Moderate">51-100</div>
-                <div class="scale-item" data-level="Unhealthy">101-150</div>
-                <div class="scale-item" data-level="Very Unhealthy">151-200</div>
-                <div class="scale-item" data-level="Hazardous">201+</div>
+        <section class="results-container" aria-labelledby="results-heading" style="display: none;">
+            <h2 id="results-heading" class="sr-only">Air Quality Results</h2>
+        </section>
+
+        <!-- Visualization Component Container (Lazy loaded) -->
+        <div id="visualization-placeholder" class="placeholder">
+            <div class="placeholder-content">
+                <i class="fas fa-chart-line"></i>
+                <p>Advanced visualizations load after search</p>
             </div>
         </div>
+        <section class="visualization-container" aria-labelledby="visualization-heading" style="display: none;">
+            <h2 id="visualization-heading" class="sr-only">Data Visualization</h2>
+        </section>
+    </main>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h2>Initializing AQI Calculator</h2>
+            <p>Loading advanced features...</p>
+        </div>
     </div>
-    <script src="script.js"></script>
+
+    <!-- Error Boundary -->
+    <div id="error-boundary" class="error-boundary" style="display: none;">
+        <div class="error-content">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h2>Something went wrong</h2>
+            <p>We're having trouble loading the application. Please try refreshing the page.</p>
+            <button onclick="window.location.reload()">Refresh Page</button>
+        </div>
+    </div>
+
+    <!-- Service Worker Registration -->
+    <script>
+        // Register service worker for PWA functionality
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => console.log('SW registered'))
+                    .catch(error => console.log('SW registration failed'));
+            });
+        }
+
+        // Global error handler
+        window.addEventListener('error', (event) => {
+            console.error('Global error:', event.error);
+            document.getElementById('error-boundary').style.display = 'flex';
+        });
+
+        window.addEventListener('unhandledrejection', (event) => {
+            console.error('Unhandled promise rejection:', event.reason);
+            document.getElementById('error-boundary').style.display = 'flex';
+        });
+    </script>
+
+    <!-- Main Application Script (Optimized) -->
+    <script type="module">
+        // Preload critical resources
+        const link = document.createElement('link');
+        link.rel = 'modulepreload';
+        link.href = 'src/bundle.js';
+        document.head.appendChild(link);
+
+        // Load main application
+        import('./src/main.js');
+    </script>
 </body>
 </html>
