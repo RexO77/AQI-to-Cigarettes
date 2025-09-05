@@ -63,7 +63,22 @@
         <!-- Search Component Container -->
         <section class="search-container" aria-labelledby="search-heading">
             <h2 id="search-heading" class="sr-only">City Search</h2>
-            <!-- Search will be loaded here -->
+            <div class="search-input-wrapper">
+                <input
+                    type="text"
+                    id="cityInput"
+                    placeholder="Enter city name (e.g., London, Tokyo, New York)"
+                    autocomplete="off"
+                    spellcheck="false"
+                >
+                <button type="button" id="searchBtn" class="search-btn" aria-label="Search">
+                    <i class="fas fa-search"></i>
+                </button>
+                <button type="button" id="locationBtn" class="location-btn" aria-label="Use current location">
+                    <i class="fas fa-map-marker-alt"></i>
+                </button>
+            </div>
+            <div id="autocomplete-list" class="autocomplete-list" role="listbox" aria-label="City suggestions"></div>
         </section>
 
         <!-- Results Component Container (Lazy loaded) -->
@@ -131,16 +146,7 @@
         });
     </script>
 
-    <!-- Main Application Script (Optimized) -->
-    <script type="module">
-        // Preload critical resources
-        const link = document.createElement('link');
-        link.rel = 'modulepreload';
-        link.href = 'src/bundle.js';
-        document.head.appendChild(link);
-
-        // Load main application
-        import('./src/main.js');
-    </script>
+    <!-- Main Application Script (Simple & Working) -->
+    <script src="src/simple-app.js"></script>
 </body>
 </html>

@@ -503,3 +503,4 @@ async function cleanupExpiredCache() {
 // Export for debugging
 self.getCacheStats = getCacheStats;
 
+

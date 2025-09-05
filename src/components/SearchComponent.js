@@ -15,27 +15,25 @@ export class SearchComponent extends Component {
     if (!this.element) return;
 
     this.element.innerHTML = `
-      <div class="search-container">
-        <div class="search-input-wrapper">
-          <input
-            type="text"
-            id="cityInput"
-            placeholder="Enter city name (e.g., London, Tokyo, New York)"
-            autocomplete="off"
-            spellcheck="false"
-          >
-          <button type="button" id="searchBtn" class="search-btn" aria-label="Search">
-            <i class="fas fa-search"></i>
-          </button>
-          <button type="button" id="locationBtn" class="location-btn" aria-label="Use current location">
-            <i class="fas fa-map-marker-alt"></i>
-          </button>
-        </div>
-        <div id="autocomplete-list" class="autocomplete-list" role="listbox" aria-label="City suggestions"></div>
-        <div id="search-history" class="search-history" style="display: none;">
-          <h4>Recent Searches</h4>
-          <div class="history-list"></div>
-        </div>
+      <div class="search-input-wrapper">
+        <input
+          type="text"
+          id="cityInput"
+          placeholder="Enter city name (e.g., London, Tokyo, New York)"
+          autocomplete="off"
+          spellcheck="false"
+        >
+        <button type="button" id="searchBtn" class="search-btn" aria-label="Search">
+          <i class="fas fa-search"></i>
+        </button>
+        <button type="button" id="locationBtn" class="location-btn" aria-label="Use current location">
+          <i class="fas fa-map-marker-alt"></i>
+        </button>
+      </div>
+      <div id="autocomplete-list" class="autocomplete-list" role="listbox" aria-label="City suggestions"></div>
+      <div id="search-history" class="search-history" style="display: none;">
+        <h4>Recent Searches</h4>
+        <div class="history-list"></div>
       </div>
     `;
 
@@ -490,4 +488,5 @@ export class SearchComponent extends Component {
     }
   }
 }
+
 
