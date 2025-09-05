@@ -2,11 +2,16 @@
 import { EventBus } from '../core/EventBus.js';
 
 export class DataManager {
-  constructor() {
+  /**
+   * @param {Object} [options]
+   * @param {string} [options.apiKey] - API key, should be provided via environment variable or secure config
+   */
+  constructor(options = {}) {
     this.cache = new Map();
     this.workers = new Map();
     this.offline = 'serviceWorker' in navigator;
-    this.apiKey = '7f74765aaa2a9fb00ac8e6262e582771'; // Should be moved to config
+    // API key should be provided via options, environment variable, or secure config
+    this.apiKey = options.apiKey || (typeof process !== 'undefined' && process.env && process.env.API_KEY) || (typeof window !== 'undefined' && window.API_KEY) || undefined;
     this.eventBus = new EventBus();
     this.retryAttempts = 3;
     this.retryDelay = 1000;
