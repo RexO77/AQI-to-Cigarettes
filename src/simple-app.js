@@ -292,6 +292,9 @@ class SimpleAQIApp {
         </div>
       </div>
     `;
+
+    // Show advanced visualizations
+    this.showVisualization(data);
   }
 
   getAQICategory(aqi) {
@@ -338,6 +341,339 @@ class SimpleAQIApp {
       }
     }
     return 0;
+  }
+
+  showVisualization(data) {
+    // Hide visualization placeholder
+    const vizPlaceholder = document.getElementById('visualization-placeholder');
+    if (vizPlaceholder) vizPlaceholder.style.display = 'none';
+    
+    // Show visualization container
+    const vizContainer = document.querySelector('.visualization-container');
+    if (!vizContainer) return;
+    
+    vizContainer.style.display = 'block';
+    
+    // Generate historical trend data (simulated)
+    const trendData = this.generateTrendData(data.aqi, data.pm25);
+    const pollutantData = this.generatePollutantBreakdown(data);
+    
+    vizContainer.innerHTML = `
+      <div class="visualization-header">
+        <h3>Advanced Air Quality Analysis</h3>
+        <div class="visualization-controls">
+          <button class="viz-btn active" data-chart="trend">7-Day Trend</button>
+          <button class="viz-btn" data-chart="breakdown">Pollutant Breakdown</button>
+          <button class="viz-btn" data-chart="health">Health Impact</button>
+        </div>
+      </div>
+      
+      <div class="chart-container">
+        <canvas id="aqiChart" width="800" height="400"></canvas>
+      </div>
+      
+      <div class="chart-insights">
+        <div class="insight-card">
+          <h4>Air Quality Trend</h4>
+          <p>Current AQI of ${data.aqi} is ${this.getTrendDirection(trendData)} compared to the 7-day average of ${Math.round(trendData.reduce((a, b) => a + b.aqi, 0) / 7)}.</p>
+        </div>
+        
+        <div class="insight-card">
+          <h4>Health Recommendation</h4>
+          <p>${this.getHealthRecommendation(data.aqi)}</p>
+        </div>
+        
+        <div class="insight-card">
+          <h4>Cigarette Comparison</h4>
+          <p>Breathing this air for 24 hours equals smoking ${data.cigarettes} cigarette${data.cigarettes !== 1 ? 's' : ''}. ${this.getCigaretteComparison(data.cigarettes)}</p>
+        </div>
+      </div>
+    `;
+    
+    // Initialize chart
+    this.initializeChart(trendData, pollutantData, data);
+    this.setupChartControls();
+  }
+
+  generateTrendData(currentAqi, currentPm25) {
+    const data = [];
+    const today = new Date();
+    
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      
+      // Simulate realistic variations
+      const variation = (Math.random() - 0.5) * 40;
+      const aqi = Math.max(10, Math.min(300, currentAqi + variation));
+      const pm25 = Math.max(5, Math.min(200, currentPm25 + (variation * 0.6)));
+      
+      data.push({
+        date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        aqi: Math.round(aqi),
+        pm25: Math.round(pm25 * 10) / 10,
+        cigarettes: Math.max(0, Math.round(pm25 / 22))
+      });
+    }
+    
+    return data;
+  }
+
+  generatePollutantBreakdown(data) {
+    // Simulate realistic pollutant distribution
+    const pm25 = data.pm25;
+    return {
+      'PM2.5': pm25,
+      'PM10': pm25 * 1.8,
+      'NO2': Math.max(10, pm25 * 0.4),
+      'SO2': Math.max(5, pm25 * 0.2),
+      'CO': Math.max(0.5, pm25 * 0.1),
+      'O3': Math.max(20, pm25 * 0.6)
+    };
+  }
+
+  initializeChart(trendData, pollutantData, currentData) {
+    const canvas = document.getElementById('aqiChart');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    this.currentChart = 'trend';
+    this.chartData = { trendData, pollutantData, currentData };
+    
+    this.drawTrendChart(ctx, trendData);
+  }
+
+  drawTrendChart(ctx, data) {
+    const canvas = ctx.canvas;
+    const width = canvas.width;
+    const height = canvas.height;
+    const padding = 60;
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, width, height);
+    
+    // Set up chart area
+    const chartWidth = width - 2 * padding;
+    const chartHeight = height - 2 * padding;
+    
+    // Find data ranges
+    const maxAqi = Math.max(...data.map(d => d.aqi));
+    const minAqi = Math.min(...data.map(d => d.aqi));
+    const range = maxAqi - minAqi || 50;
+    
+    // Draw grid
+    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--border-color') || '#e0e0e0';
+    ctx.lineWidth = 1;
+    
+    // Horizontal grid lines
+    for (let i = 0; i <= 5; i++) {
+      const y = padding + (chartHeight * i) / 5;
+      ctx.beginPath();
+      ctx.moveTo(padding, y);
+      ctx.lineTo(width - padding, y);
+      ctx.stroke();
+      
+      // Y-axis labels
+      const value = Math.round(maxAqi - (range * i) / 5);
+      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary') || '#666';
+      ctx.font = '12px system-ui';
+      ctx.textAlign = 'right';
+      ctx.fillText(value, padding - 10, y + 4);
+    }
+    
+    // Draw AQI line
+    ctx.strokeStyle = '#4CAF50';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    
+    data.forEach((point, index) => {
+      const x = padding + (chartWidth * index) / (data.length - 1);
+      const y = padding + chartHeight - ((point.aqi - minAqi) / range) * chartHeight;
+      
+      if (index === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+      
+      // Draw data points
+      ctx.save();
+      ctx.fillStyle = this.getAQIColor(point.aqi);
+      ctx.beginPath();
+      ctx.arc(x, y, 6, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.restore();
+      
+      // X-axis labels
+      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary') || '#666';
+      ctx.font = '11px system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillText(point.date, x, height - padding + 20);
+    });
+    
+    ctx.stroke();
+    
+    // Chart title
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-primary') || '#333';
+    ctx.font = 'bold 16px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText('7-Day AQI Trend', width / 2, 30);
+  }
+
+  drawBreakdownChart(ctx, data) {
+    const canvas = ctx.canvas;
+    const width = canvas.width;
+    const height = canvas.height;
+    const padding = 60;
+    
+    ctx.clearRect(0, 0, width, height);
+    
+    const pollutants = Object.keys(data);
+    const values = Object.values(data);
+    const maxValue = Math.max(...values);
+    
+    const barWidth = (width - 2 * padding) / pollutants.length - 20;
+    const chartHeight = height - 2 * padding;
+    
+    // Draw bars
+    pollutants.forEach((pollutant, index) => {
+      const value = values[index];
+      const barHeight = (value / maxValue) * chartHeight;
+      const x = padding + index * (barWidth + 20);
+      const y = height - padding - barHeight;
+      
+      // Bar color based on pollutant type
+      const colors = {
+        'PM2.5': '#FF6B6B',
+        'PM10': '#4ECDC4',
+        'NO2': '#45B7D1',
+        'SO2': '#96CEB4',
+        'CO': '#FFEAA7',
+        'O3': '#DDA0DD'
+      };
+      
+      ctx.fillStyle = colors[pollutant] || '#999';
+      ctx.fillRect(x, y, barWidth, barHeight);
+      
+      // Value labels
+      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-primary') || '#333';
+      ctx.font = '12px system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillText(value.toFixed(1), x + barWidth / 2, y - 5);
+      
+      // Pollutant labels
+      ctx.fillText(pollutant, x + barWidth / 2, height - padding + 20);
+    });
+    
+    // Chart title
+    ctx.font = 'bold 16px system-ui';
+    ctx.fillText('Pollutant Breakdown (μg/m³)', width / 2, 30);
+  }
+
+  drawHealthChart(ctx, data) {
+    const canvas = ctx.canvas;
+    const width = canvas.width;
+    const height = canvas.height;
+    
+    ctx.clearRect(0, 0, width, height);
+    
+    // Draw cigarette comparison visualization
+    const cigarettes = data.cigarettes;
+    const maxCigs = 20; // Max cigarettes to show
+    const cigWidth = 30;
+    const cigHeight = 8;
+    const rows = Math.ceil(Math.min(cigarettes, maxCigs) / 10);
+    
+    ctx.fillStyle = '#8B4513';
+    
+    for (let i = 0; i < Math.min(cigarettes, maxCigs); i++) {
+      const row = Math.floor(i / 10);
+      const col = i % 10;
+      const x = width / 2 - 150 + col * (cigWidth + 5);
+      const y = height / 2 - 50 + row * (cigHeight + 10);
+      
+      // Draw cigarette
+      ctx.fillRect(x, y, cigWidth, cigHeight);
+      
+      // Draw filter
+      ctx.fillStyle = '#F4A460';
+      ctx.fillRect(x + cigWidth - 8, y, 8, cigHeight);
+      ctx.fillStyle = '#8B4513';
+    }
+    
+    // Additional cigarettes indicator
+    if (cigarettes > maxCigs) {
+      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-primary') || '#333';
+      ctx.font = '14px system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillText(`+${cigarettes - maxCigs} more cigarettes`, width / 2, height / 2 + 60);
+    }
+    
+    // Title and info
+    ctx.font = 'bold 16px system-ui';
+    ctx.fillText('Daily Cigarette Equivalent', width / 2, 30);
+    
+    ctx.font = '14px system-ui';
+    ctx.fillText(`${cigarettes} cigarette${cigarettes !== 1 ? 's' : ''} per day`, width / 2, height - 40);
+  }
+
+  setupChartControls() {
+    const buttons = document.querySelectorAll('.viz-btn');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        // Update active state
+        buttons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        // Switch chart
+        const chartType = btn.dataset.chart;
+        const canvas = document.getElementById('aqiChart');
+        if (!canvas) return;
+        
+        const ctx = canvas.getContext('2d');
+        
+        switch (chartType) {
+          case 'trend':
+            this.drawTrendChart(ctx, this.chartData.trendData);
+            break;
+          case 'breakdown':
+            this.drawBreakdownChart(ctx, this.chartData.pollutantData);
+            break;
+          case 'health':
+            this.drawHealthChart(ctx, this.chartData.currentData);
+            break;
+        }
+      });
+    });
+  }
+
+  getTrendDirection(trendData) {
+    const recent = trendData.slice(-3).reduce((a, b) => a + b.aqi, 0) / 3;
+    const older = trendData.slice(0, 3).reduce((a, b) => a + b.aqi, 0) / 3;
+    
+    if (recent > older + 10) return 'significantly higher';
+    if (recent > older + 5) return 'higher';
+    if (recent < older - 10) return 'significantly lower';
+    if (recent < older - 5) return 'lower';
+    return 'similar';
+  }
+
+  getHealthRecommendation(aqi) {
+    if (aqi <= 50) return 'Air quality is good. Great day for outdoor activities!';
+    if (aqi <= 100) return 'Air quality is moderate. Sensitive individuals should consider limiting outdoor activities.';
+    if (aqi <= 150) return 'Unhealthy for sensitive groups. Children, elderly, and people with respiratory conditions should limit outdoor exposure.';
+    if (aqi <= 200) return 'Unhealthy air quality. Everyone should limit outdoor activities and wear masks when outside.';
+    if (aqi <= 300) return 'Very unhealthy air. Avoid outdoor activities. Stay indoors with air purifiers if possible.';
+    return 'Hazardous air quality. Emergency conditions. Avoid all outdoor activities.';
+  }
+
+  getCigaretteComparison(cigarettes) {
+    if (cigarettes === 0) return 'Equivalent to breathing clean air.';
+    if (cigarettes <= 2) return 'Similar to light exposure to secondhand smoke.';
+    if (cigarettes <= 5) return 'Comparable to being in a moderately smoky environment.';
+    if (cigarettes <= 10) return 'Like being in a heavily polluted urban area.';
+    if (cigarettes <= 20) return 'Equivalent to heavy smoking exposure.';
+    return 'Extremely hazardous - like chain smoking.';
   }
 
   showError(message) {
