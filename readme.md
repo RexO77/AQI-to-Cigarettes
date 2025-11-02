@@ -113,5 +113,5 @@ For questions or feedback, please reach out to [@Niyam07](https://github.com/rex
 ---
 
 <div align="center">
-  Made with ❤️ for a cleaner planet
+  Made with ❤️ to raise Awareness 
 </div>
